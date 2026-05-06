@@ -1,0 +1,203 @@
+const pool = require("../db");
+
+
+//helper function 1
+function toTitleCase(str) {
+    return str
+        .toLowerCase()
+        .replace(/\b\w/g, char => char.toUpperCase());
+}
+
+
+
+
+// helper function 2
+function sendResponse(res,data,startTime) {
+    const responseTime = Date.now() - startTime;
+
+
+    res.json({
+        success :true,
+        count : data.length,
+        data : data,
+        meta : {
+            responseTime : responseTime
+        }
+    });
+}
+
+//1. get all states
+exports.getStates = async (req, res) => {
+    const startTime = Date.now();
+    try{
+        const result = await pool.query("SELECT * FROM states ORDER BY state_name");
+        sendResponse(res,result.rows,startTime);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error:"server error"});
+    }
+}
+
+
+
+
+//2.get all districts
+exports.getDistricts = async (req, res) => {
+    const startTime = Date.now();
+    try{
+        const {state_code} = req.params;
+
+        const result = await pool.query(
+            "SELECT d.* FROM districts d JOIN states s ON d.state_id = s.id WHERE s.state_code = $1 ORDER BY d.district_name",
+            [Number(state_code)]
+        );
+        sendResponse(res,result.rows,startTime);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error:"server error"});
+    }
+}
+
+
+//3.get all subdistricts
+exports.getSubdistricts = async (req, res) => {
+    const startTime = Date.now();
+    try{
+        const {district_code} = req.params;
+
+        const result = await pool.query("SELECT sd.* FROM subdistricts sd JOIN districts d ON sd.district_id = d.id WHERE d.district_code = $1 ORDER BY sd.subdistrict_name",
+            [Number(district_code)]
+        );
+        sendResponse(res,result.rows,startTime);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error:"server error"});
+    }
+}
+
+
+//4.get all villages
+exports.getVillages = async (req, res) => {
+    const startTime = Date.now();
+    try{
+        const {subdistrict_code} = req.params;
+
+        const result = await pool.query("SELECT v.* FROM villages v JOIN subdistricts sd ON v.subdistrict_id = sd.id WHERE sd.subdistrict_code = $1 ORDER BY v.village_name LIMIT 100",
+            [Number(subdistrict_code)]
+        );
+        sendResponse(res,result.rows,startTime);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error:"server error"});
+    }
+}
+
+
+
+//search api
+exports.searchVillages = async (req,res) => {
+    const startTime = Date.now();
+    try {
+        const { q } = req.query;
+
+        const result = await pool.query(
+            `SELECT DISTINCT ON (v.village_name) v.id,v.village_name,sd.subdistrict_name,d.district_name,s.state_name
+            FROM villages v
+            JOIN subdistricts sd 
+            ON v.subdistrict_id = sd.id
+            JOIN districts d 
+            ON sd.district_id = d.id
+            JOIN states s 
+            ON d.state_id = s.id
+            WHERE LOWER(v.village_name) LIKE LOWER($1)
+            ORDER BY v.village_name ASC
+            LIMIT 20`,
+            [`${q}%`]
+        );
+
+       const formatted = result.rows.map(row => {
+        const name = row.village_name
+                .replace(/\(\d+\)/g, "")
+                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                .replace(/\s+/g, " ")
+                .replace(/\.\s*/g, ". ")
+                .trim()
+                .replace(/^./, c => c.toUpperCase());
+        return {
+            value : row.id,
+            label : name,
+            fullAddress : `${name}, ${row.subdistrict_name}, ${row.district_name}, ${toTitleCase(row.state_name)}, India`,
+            hierarchy : {
+                village : name,
+                subDistrict : row.subdistrict_name,
+                district : row.district_name,
+                state : toTitleCase(row.state_name),
+                country : "India"
+            }
+        };
+
+       });
+        sendResponse(res,formatted,startTime);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({error:"server error"});
+    }
+}
+
+
+// Autocomplete villages api
+exports.autocompleteVillages = async (req,res) => {
+    const startTime = Date.now();
+    try {
+        const { q } = req.query;
+
+        if(!q || q.length < 2){
+            return sendResponse(res,[],startTime);
+        }
+
+
+        const result = await pool.query(
+            `SELECT DISTINCT ON (v.village_name) v.id,v.village_name,sd.subdistrict_name,d.district_name,s.state_name
+            FROM villages v
+            JOIN subdistricts sd 
+            ON v.subdistrict_id = sd.id
+            JOIN districts d 
+            ON sd.district_id = d.id
+            JOIN states s 
+            ON d.state_id = s.id
+            WHERE LOWER(v.village_name) LIKE LOWER($1)
+            ORDER BY v.village_name ASC
+            LIMIT 20`,
+            [`${q}%`]
+        );
+
+        const formatted = result.rows.map(row => {
+            const name = row.village_name
+                .replace(/\(\d+\)/g, "")
+                .replace(/([a-z])([A-Z])/g, "$1 $2")
+                .replace(/\s+/g, " ")
+                .replace(/\.\s*/g, ". ")
+                .trim()
+                .replace(/^./, c => c.toUpperCase());
+
+            return {
+                value : row.id,
+                label : name,
+                fullAddress : `${name}, ${row.subdistrict_name}, ${row.district_name}, ${toTitleCase(row.state_name)}, India`,
+                hierarchy : {
+                    village : name,
+                    subDistrict : row.subdistrict_name,
+                    district : row.district_name,
+                    state : toTitleCase(row.state_name),
+                    country : "India"
+                }
+            };
+
+        });
+
+        sendResponse(res,formatted,startTime);
+    } catch (err) {
+        console.error("Autocomplete ERROR:",err.message);
+        res.status(500).json({error:"server error"});
+    }
+}

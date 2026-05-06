@@ -1,0 +1,76 @@
+Skill Mastery & Capstone Project Execution
+DONE
+TASK
+MEDIUM
+Assigned to
+JE
+jeevansri2003
+VI
+vijaykosuru27
+RO
+rohitmotamarri
+SH
+shreyashra3
+SA
+saziyakhanam2003
+Due : 10 Apr 2026
+Objective
+Before starting the capstone project, every team member must build a strong foundation in required skills and then apply them to develop a production-ready solution.
+
+🧠 Phase 1: Skill Mastery (Self-Learning)
+Each team member is expected to:
+
+Identify the core skills required for the project:
+SQL & Database Design
+API Development (Node.js / Backend)
+React.js (Frontend)
+Data Cleaning & Processing (Python)
+Basic Data Visualization
+Learn and practice these skills using:
+Online platforms (free/paid courses)
+Documentation (official docs preferred)
+Your favorite YouTube creators / tutorials
+Hands-on mini practice projects
+👉 Focus on practical understanding, not just theory.
+
+🔍 Learning Guidelines
+Do not copy blindly — understand concepts deeply
+Build small test projects (e.g., simple API, small dashboard)
+Practice real scenarios:
+Writing SQL queries
+Creating APIs
+Handling data
+✅ Phase 1 Deliverables
+Before moving to the capstone project, ensure:
+
+You can write basic to intermediate SQL queries
+You can build a simple API (CRUD operations)
+You understand how frontend connects to backend APIs
+You can handle and clean raw data (Excel/CSV)
+🚀 Phase 2: Start Capstone Project
+Once the required skills are learned:
+
+Start working on the Capstone Project: All India Villages API
+Follow proper development practices:
+Divide tasks within the team
+Use version control (Git)
+Maintain clean and modular code
+Write scalable and optimized logic
+⚠️ Important Note
+This is not just a learning task — it is a real-world simulation.
+
+Your goal is to:
+
+Think like engineers
+Build like professionals
+Deliver like a product team
+🏁 Final Goal
+By completing this process, you should be able to:
+
+Independently build real-world applications
+Understand end-to-end system design
+Be industry-ready for roles in:
+Data Analysis
+Backend Development
+Full Stack Development
+👉 Action Step:

@@ -1,0 +1,175 @@
+Phase 1
+DONE
+TASK
+MEDIUM
+Assigned to
+JE
+jeevansri2003
+VI
+vijaykosuru27
+RO
+rohitmotamarri
+SH
+shreyashra3
+SA
+saziyakhanam2003
+Due : 10 Apr 2026
+3. Technical Architecture
+3.1 Technology Stack Decision Matrix
+
+
+ComponentSelected TechnologyJustificationBackend RuntimeNode.js + Express.jsHigh throughput for I/O-bound API operationsDatabaseNeonDB (PostgreSQL)Serverless PostgreSQL with automatic scalingORMPrismaType-safe database queries, schema migrationsFrontend FrameworkReact.js + ViteFast development, excellent ecosystemCharting LibraryRechartsReact-native, declarative, customizableCaching LayerRedis (Upstash)Global edge caching, low latencyRate Limitingexpress-rate-limit + RedisDistributed rate limiting across regionsAuthenticationJWT + bcryptStateless, secure, scalableHosting PlatformVercelAutomatic deployments, edge network, serverless functions
+
+3.2 System Architecture Diagram (Conceptual)
+text
+
+┌────────────────────────────────────────────────────────────────────┐
+│                         CLIENT LAYER                                │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐              │
+│  │ Admin User   │  │ B2B Client   │  │ Demo Client  │              │
+│  │ (React SPA)  │  │ (React SPA)  │  │ (Contact Form│              │
+│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘              │
+└─────────┼─────────────────┼─────────────────┼──────────────────────┘
+          │                 │                 │
+          ▼                 ▼                 ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                      VERZEL EDGE NETWORK                            │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                    API Gateway Layer                          │  │
+│  │  • Rate Limiting (Redis)  • JWT Validation  • CORS Handling  │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+│                                                                     │
+│  ┌──────────────────────────────────────────────────────────────┐  │
+│  │                  Serverless Functions (Node.js)               │  │
+│  │  /api/v1/*      /api/admin/*     /api/b2b/*    /api/auth/*   │  │
+│  └──────────────────────────────────────────────────────────────┘  │
+└────────────────────────────────────────────────────────────────────┘
+          │
+          ▼
+┌────────────────────────────────────────────────────────────────────┐
+│                      DATA LAYER                                     │
+│  ┌─────────────────┐         ┌─────────────────┐                   │
+│  │   NeonDB        │◄───────►│  Redis Cache    │                   │
+│  │  (PostgreSQL)   │         │  (Upstash)      │                   │
+│  │                 │         │                 │                   │
+│  │ • State         │         │ • API Keys      │                   │
+│  │ • District      │         │ • Rate Limits   │                   │
+│  │ • SubDistrict   │         │ • Session Data  │                   │
+│  │ • Village       │         │ • Query Cache   │                   │
+│  │ • User          │         │                 │                   │
+│  │ • ApiKey        │         │                 │                   │
+│  │ • ApiLog        │         │                 │                   │
+│  └─────────────────┘         └─────────────────┘                   │
+└────────────────────────────────────────────────────────────────────┘
+
+
+
+
+3.3 Data Flow Patterns
+API Request Flow:
+
+Client sends request with API Key header
+Edge gateway validates API key format
+Rate limiter checks Redis for daily usage
+Authentication middleware validates key + secret
+Request routed to appropriate handler
+Database query executed (cached if available)
+Response formatted with standardized address
+API log asynchronously recorded
+Response returned to client
+Data Import Flow:
+
+Excel file received from MDDS source
+Python script reads and validates data
+Country record created/verified (India)
+State records upserted with deduplication
+District records upserted with foreign keys
+Sub-district records upserted
+Village records batch inserted
+Progress tracking and error logging
+Verification queries run for data integrity
+4. Database Design
+4.1 Normalization Strategy
+The database follows Third Normal Form (3NF) with the following design principles:
+
+Eliminate duplicate data through proper foreign key relationships
+Ensure each fact table relates to exactly one dimension
+Support international expansion (adding other countries)
+Enable efficient hierarchical queries
+4.2 Entity Relationship Summary
+
+
+TablePurposeKey FieldsForeign Key ToCountryRoot of hierarchyid, name, code-StateState-level dataid, code, nameCountry.idDistrictDistrict-level dataid, code, nameState.idSubDistrictBlock/Taluka levelid, code, nameDistrict.idVillageVillage/area levelid, code, nameSubDistrict.idUserB2B client accountsid, email, planType-ApiKeyAPI credentialsid, key, secretHashUser.idUserStateAccessAccess controluserId, stateIdUser.id, State.idApiLogUsage trackingid, endpoint, responseTimeApiKey.id, User.id
+
+4.3 Indexing Strategy for Performance
+
+
+TableIndexed ColumnsPurposeVillagename (trigram)Fast text searchVillagesubDistrictIdHierarchical queriesSubDistrictdistrictIdJoin performanceDistrictstateIdJoin performanceApiLogcreatedAt, userIdTime-series analyticsApiKeykeyAuthentication lookups
+
+4.4 Sample Data Relationship
+Based on the provided dataset:
+
+text
+
+State: Maharashtra (code: 27)
+  └── District: Nandurbar (code: 497)
+      └── SubDistrict: Akkalkuwa (code: 03950)
+          ├── Village: Manibeli (code: 525002)
+          ├── Village: Dhankhedi (code: 525003)
+          ├── Village: Chimalkhadi (code: 525004)
+          └── Village: Sinduri (code: 525005)
+
+
+
+
+4.5 Future-Proofing Considerations
+Country table enables expansion to other nations
+Code fields preserve original MDDS identifiers
+Timestamps on all tables for audit trails
+Soft delete capability (status flags where needed)
+5. Data Import Strategy
+5.1 Source Data Understanding
+The MDDS (Ministry of Drinking Water and Sanitation) dataset contains:
+
+MDDS STC: State Code (numeric, e.g., 27 for Maharashtra)
+STATE NAME: State name in text
+MDDS DTC: District Code (numeric/string)
+DISTRICT NAME: District name
+MDDS Sub_DT: Sub-District Code
+SUB-DISTRICT NAME: Sub-district/Block name
+MDDS PLCN: Village/Locality Code (unique identifier)
+Area Name: Village/Area name
+5.2 Data Volume Estimates
+
+
+Hierarchy LevelEstimated CountStates36 (including UTs)Districts700+Sub-Districts6,000+Villages600,000+Total Rows~600,000
+
+5.3 Import Process Workflow
+Phase 1: Environment Setup
+
+Create NeonDB PostgreSQL instance
+Install Python dependencies (pandas, psycopg2, openpyxl)
+Configure database connection string
+Phase 2: Data Validation
+
+Verify column headers match expected schema
+Check for null values in required fields
+Identify duplicate entries
+Validate code formats and uniqueness
+Phase 3: Incremental Import
+
+Insert/update Country record (India)
+Process states: deduplicate by state code
+Process districts: link to correct state
+Process sub-districts: link to correct district
+Process villages: batch insert in chunks of 5,000
+Phase 4: Verification
+
+Run count queries to validate totals
+Spot-check random villages for correct hierarchy
+Verify no orphaned records
+5.4 Error Handling Strategy
+Log all failed rows with reason codes
+Continue processing on non-fatal errors
+Generate summary report after completion
+Manual review queue for ambiguous records

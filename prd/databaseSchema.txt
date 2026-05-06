@@ -1,0 +1,77 @@
+Server [localhost]:
+Database [postgres]: villageDB
+Port [5432]:
+Username [postgres]:
+Password for user postgres:
+
+psql (18.3)
+WARNING: Console code page (850) differs from Windows code page (1252)
+         8-bit characters might not work correctly. See psql reference
+         page "Notes for Windows users" for details.
+Type "help" for help.
+
+villageDB=# \d states;
+                              Table "public.states"
+   Column   |  Type   | Collation | Nullable |              Default
+------------+---------+-----------+----------+------------------------------------
+ id         | integer |           | not null | nextval('states_id_seq'::regclass)
+ state_code | integer |           |          |
+ state_name | text    |           | not null |
+Indexes:
+    "states_pkey" PRIMARY KEY, btree (id)
+    "states_state_code_key" UNIQUE CONSTRAINT, btree (state_code)
+Referenced by:
+    TABLE "districts" CONSTRAINT "districts_state_id_fkey" FOREIGN KEY (state_id) REFERENCES states(id)
+
+
+villageDB=# \d districts
+                                Table "public.districts"
+    Column     |  Type   | Collation | Nullable |                Default
+---------------+---------+-----------+----------+---------------------------------------
+ id            | integer |           | not null | nextval('districts_id_seq'::regclass)
+ district_code | integer |           |          |
+ district_name | text    |           | not null |
+ state_id      | integer |           | not null |
+Indexes:
+    "districts_pkey" PRIMARY KEY, btree (id)
+    "districts_district_code_state_id_key" UNIQUE CONSTRAINT, btree (district_code, state_id)
+Foreign-key constraints:
+    "districts_state_id_fkey" FOREIGN KEY (state_id) REFERENCES states(id)
+Referenced by:
+    TABLE "subdistricts" CONSTRAINT "subdistricts_district_id_fkey" FOREIGN KEY (district_id) REFERENCES districts(id)
+
+
+villageDB=# \d subdistricts;
+                                 Table "public.subdistricts"
+      Column      |  Type   | Collation | Nullable |                 Default
+------------------+---------+-----------+----------+------------------------------------------
+ id               | integer |           | not null | nextval('subdistricts_id_seq'::regclass)
+ subdistrict_code | integer |           |          |
+ subdistrict_name | text    |           | not null |
+ district_id      | integer |           | not null |
+Indexes:
+    "subdistricts_pkey" PRIMARY KEY, btree (id)
+    "subdistricts_subdistrict_code_district_id_key" UNIQUE CONSTRAINT, btree (subdistrict_code, district_id)
+Foreign-key constraints:
+    "subdistricts_district_id_fkey" FOREIGN KEY (district_id) REFERENCES districts(id)
+Referenced by:
+    TABLE "villages" CONSTRAINT "villages_subdistrict_id_fkey" FOREIGN KEY (subdistrict_id) REFERENCES subdistricts(id)
+
+
+villageDB=# \d villages;
+                                Table "public.villages"
+     Column     |  Type   | Collation | Nullable |               Default
+----------------+---------+-----------+----------+--------------------------------------
+ id             | integer |           | not null | nextval('villages_id_seq'::regclass)
+ village_code   | integer |           |          |
+ village_name   | text    |           | not null |
+ subdistrict_id | integer |           | not null |
+Indexes:
+    "villages_pkey" PRIMARY KEY, btree (id)
+    "idx_village_name_lower" btree (lower(village_name))
+    "villages_village_code_subdistrict_id_key" UNIQUE CONSTRAINT, btree (village_code, subdistrict_id)
+Foreign-key constraints:
+    "villages_subdistrict_id_fkey" FOREIGN KEY (subdistrict_id) REFERENCES subdistricts(id)
+
+
+villageDB=#

@@ -1,0 +1,15 @@
+const express = require("express");
+const router = express.Router();
+const controller = require("../controllers/locationController")
+
+const {getStates,getDistricts,getSubdistricts,getVillages, searchVillages,autocompleteVillages} = require("../controllers/locationController");
+
+//routes
+router.get("/states",controller.getStates);
+router.get("/states/:state_code/districts",controller.getDistricts);
+router.get("/districts/:district_code/subdistricts",controller.getSubdistricts);
+router.get("/subdistricts/:subdistrict_code/villages",controller.getVillages);
+router.get("/search",searchVillages);
+router.get("/autocomplete",autocompleteVillages);
+
+module.exports = router;

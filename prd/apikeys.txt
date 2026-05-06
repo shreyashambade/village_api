@@ -1,0 +1,11 @@
+{
+  "success": true,
+  "message": "API key created. Store your secret safely — it will not be shown again.",
+  "data": {
+    "id": 1,
+    "key_name": "Production Server",
+    "api_key": "ak_fe091cc73306163f81f23676a7062f6e",
+    "created_at": "2026-05-05T08:45:09.321Z",
+    "api_secret": "as_0f36f4cb8833739916999ba433f3b36a"
+  }
+}
