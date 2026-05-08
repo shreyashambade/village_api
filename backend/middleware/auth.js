@@ -102,7 +102,7 @@ exports.requireApiKey = async (req, res, next) => {
         next();
  
     } catch (err) {
-        console.error("requireApiKey error:", err.message);
+        console.error("requireApiKey  full error:", err);
         return res.status(500).json({
             success: false,
             errorCode: "INTERNAL_ERROR",
