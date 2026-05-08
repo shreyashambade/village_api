@@ -1,3 +1,5 @@
+const swaggerUi = require("swagger-ui-express")
+const swaggerSpec = require("./swagger")
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
@@ -24,6 +26,9 @@ app.use("/api/auth", authLimiter, authRoutes);
 
 // location route  -  api key auth + rate limiting
 app.use("/api/v1", requireApiKey, requestLogger, dailyLimiter, burstLimiter, locationRoutes);
+
+//swagger route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //404 error handler
 app.use((req, res) => {
