@@ -274,10 +274,10 @@ exports.searchVillages = async (req,res) => {
             AND ($3::text IS NULL OR d.district_name ILIKE $3)
             AND ($4::text IS NULL OR sd.subdistrict_name ILIKE $4)
             ORDER BY 
-            (v.village_name ILIKE $5) DESC,
+            LENGTH(v.village_name),
             v.village_name ASC
             LIMIT 20`,
-            [`%${search}%`,state ? state : null,district ? district : null,subDistrict ? subDistrict : null,`${search}%`]
+            [`%${search}%`,state ? state : null,district ? district : null,subDistrict ? subDistrict : null]
         );
 
         const formatted = result.rows.map(formatVillageRow);
@@ -356,10 +356,10 @@ exports.autocompleteVillages = async (req,res) => {
             JOIN states s ON d.state_id = s.id
             WHERE v.village_name ILIKE $1
             ORDER BY
-            (v.village_name ILIKE $2) DESC,
+            LENGTH(v.village_name),
             v.village_name ASC
             LIMIT 10`;
-            values = [`${search}%`, `${search}%`];
+            values = [`${search}%`];
         } else {
             return sendError(res, 400, "INVALID_QUERY", "Invalid hierarchyLevel. Use village, subdistrict, district, or state");
         }
