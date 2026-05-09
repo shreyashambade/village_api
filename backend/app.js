@@ -30,6 +30,18 @@ app.use("/api/v1", requireApiKey, requestLogger, dailyLimiter, burstLimiter, loc
 //swagger route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+
+// add render route
+app.get("/", (req, res) => {
+    res.json({
+        success: true,
+        message: "Village Location API is running 🚀",
+        documentation: "https://village-location-api.onrender.com/api-docs"
+    });
+});
+
+
+
 //404 error handler
 app.use((req, res) => {
     res.status(404).json({
