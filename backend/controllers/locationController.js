@@ -395,3 +395,29 @@ exports.autocompleteVillages = async (req,res) => {
         sendError(res,500, "INTERNAL_ERROR", "Autocomplete failed");
     }
 };
+
+
+// ── ADMIN: ADD NEW VILLAGE ──
+exports.addVillage = async (req, res) => {
+    const startTime = Date.now();
+    try {
+        const { village_name, subdistrict_id, village_code } = req.body;
+
+        if (!village_name || !subdistrict_id) {
+            return sendError(res, 400, "INVALID_INPUT", "village_name and subdistrict_id are required.");
+        }
+
+        const result = await pool.query(
+            `INSERT INTO villages (village_name, subdistrict_id, village_code) 
+             VALUES ($1, $2, $3) RETURNING id, village_name, subdistrict_id, village_code`,
+            [village_name, parseInt(subdistrict_id), village_code ? parseInt(village_code) : null]
+        );
+
+        sendResponse(res, req, result.rows, startTime, false);
+    } catch (err) {
+        console.error("addVillage Error:", err.message);
+        sendError(res, 500, "INTERNAL_ERROR", "Failed to add village to database.");
+    }
+};
+
+

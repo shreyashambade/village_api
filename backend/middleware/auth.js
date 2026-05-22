@@ -1,39 +1,41 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
+const { PrismaClient } = require("@prisma/client");
+const { PrismaPg } = require("@prisma/adapter-pg");
 const pool = require("../db");
 
 const JWT_SECRET = process.env.JWT_SECRET || "changeme_in_production";
 
-// 1.JWT middleware (for dashboard routes)
+// ── PRISMA 7 ADAPTER SETUP ──
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
+
+// 1. JWT middleware (for dashboard routes)
+// Validates the Authorization: Bearer <token> header
+// 1. JWT middleware (for dashboard routes)
+// Validates the Authorization: Bearer <token> header
+// 1. JWT middleware (for dashboard routes)
 // Validates the Authorization: Bearer <token> header
 exports.requireJWT = (req, res, next) => {
     const authHeader = req.headers["authorization"];
- 
+    
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({
-            success: false,
-            errorCode: "INVALID_API_KEY",
-            message: "Authorization header missing or malformed"
-        });
+        return res.status(401).json({ success: false, message: "Authorization header missing or malformed" });
     }
  
-    const token = authHeader.split(" ")[1];
+    const token = authHeader.split(" ")[1]; 
  
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        req.user = decoded;  // { userId, email, plan }
+       
+        req.user = decoded; 
         next();
     } catch (err) {
-        return res.status(401).json({
-            success: false,
-            errorCode: "INVALID_API_KEY",
-            message: "Token is invalid or expired"
-        });
+        return res.status(401).json({ success: false, message: "Token is invalid or expired" });
     }
 };
  
-
-// 2.Api Key middleware (for /api/v1/* routes)
+// 2. Api Key middleware (for /api/v1/* routes)
 // Validates X-API-Key header, attaches user + plan to req
 exports.requireApiKey = async (req, res, next) => {
     const apiKey = req.headers["x-api-key"];
@@ -47,37 +49,25 @@ exports.requireApiKey = async (req, res, next) => {
     }
  
     try {
-        // Look up key + join user to get plan
-        const result = await pool.query(
-            `SELECT ak.id, ak.api_key, ak.api_secret, ak.status,
-                    u.id AS user_id, u.email, u.plan_type, u.status AS user_status
-             FROM api_keys ak
-             JOIN users u ON ak.user_id = u.id
-             WHERE ak.api_key = $1`,
-            [apiKey]
-        );
+        // 1. Look up the key in the new ApiKey table, and include the client data
+        const keyRecord = await prisma.apiKey.findUnique({
+            where: { key: apiKey },
+            include: { client: true }
+        });
  
-        if (result.rows.length === 0) {
+        // If the key doesn't exist OR it was revoked, reject them
+        if (!keyRecord || keyRecord.status !== "Active") {
             return res.status(401).json({
                 success: false,
                 errorCode: "INVALID_API_KEY",
-                message: "Invalid API key"
+                message: "API key is invalid or revoked"
             });
         }
  
-        const keyRecord = result.rows[0];
+        const client = keyRecord.client;
  
-        // Check key is active
-        if (keyRecord.status === "revoked") {
-            return res.status(401).json({
-                success: false,
-                errorCode: "INVALID_API_KEY",
-                message: "This API key has been revoked"
-            });
-        }
- 
-        // Check user account is active
-        if (keyRecord.user_status !== "active") {
+        // 2. Check user account is active
+        if (client.status !== "Active") {
             return res.status(403).json({
                 success: false,
                 errorCode: "ACCESS_DENIED",
@@ -85,19 +75,28 @@ exports.requireApiKey = async (req, res, next) => {
             });
         }
  
-        // Attach user info to request for downstream use
+        // 3. Attach user info to request (Logger and RateLimiter need this!)
+        // 3. Attach user info to request (Logger and RateLimiter need this!)
         req.user = {
-            userId:   keyRecord.user_id,
-            email:    keyRecord.email,
-            plan:     keyRecord.plan_type,
-            apiKeyId: keyRecord.id
+            userId:   client.id,
+            email:    client.email,
+            plan:     client.plan, 
+            apiKeyId: keyRecord.id,
+            // 🚀 NEW: Pass the custom limit to the rate limiter!
+            custom_daily_limit: client.custom_daily_limit 
         };
  
-        // Update last_used timestamp (async, don't await — don't slow down the request)
-        pool.query(
-            "UPDATE api_keys SET last_used = NOW() WHERE id = $1",
-            [keyRecord.id]
-        );
+        // 4. Update usage count for the client
+        prisma.client.update({
+            where: { id: client.id },
+            data: { usage: { increment: 1 } }
+        }).catch(err => console.error("Prisma usage update error:", err.message));
+
+        // 5. Update the 'Last Used' timestamp for this specific key
+        prisma.apiKey.update({
+            where: { id: keyRecord.id },
+            data: { lastUsedAt: new Date() }
+        }).catch(err => console.error("Prisma key update error:", err.message));
  
         next();
  

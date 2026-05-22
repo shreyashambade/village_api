@@ -6,7 +6,8 @@ const {getStates,
     getSubdistricts,
     getVillages, 
     searchVillages,
-    autocompleteVillages
+    autocompleteVillages,
+    addVillage
 } = require("../controllers/locationController");
 
 // swagger comments
@@ -149,6 +150,9 @@ router.get("/search", searchVillages);
  */
 
 router.get("/autocomplete", autocompleteVillages); //route
+
+// Admin Route to insert a new village
+router.post("/villages", addVillage);
 
 module.exports = router;
 

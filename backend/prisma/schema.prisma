@@ -1,0 +1,202 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+
+model api_logs {
+  id            Int       @id @default(autoincrement())
+  user_id       Int?
+  api_key_id    String?
+  endpoint      String?   @db.VarChar(255)
+  method        String?   @db.VarChar(10)
+  status_code   Int?
+  response_time Int?
+  ip_address    String?   @db.VarChar(50)
+  created_at    DateTime? @default(now()) @db.Timestamp(6)
+  ApiKey        ApiKey?   @relation(fields: [api_key_id], references: [id], onUpdate: NoAction)
+
+  // ADD THESE TWO LINES:
+  client_id     String?   
+  Client        Client?   @relation(fields: [client_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([created_at], map: "idx_api_logs_created_at")
+  @@index([user_id], map: "idx_api_logs_user_id")
+}
+
+model districts {
+  id            Int            @id @default(autoincrement())
+  district_code Int?
+  district_name String
+  state_id      Int
+  states        states         @relation(fields: [state_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  subdistricts  subdistricts[]
+
+  @@unique([district_code, state_id])
+  @@index([state_id], map: "idx_districts_state_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model districts_raw {
+  district_code Int?
+  district_name String?
+  state_code    Int?
+
+  @@ignore
+}
+
+model states {
+  id         Int         @id @default(autoincrement())
+  state_code Int?        @unique
+  state_name String
+  districts  districts[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model states_raw {
+  state_code Int?
+  state_name String?
+
+  @@ignore
+}
+
+model subdistricts {
+  id               Int        @id @default(autoincrement())
+  subdistrict_code Int?
+  subdistrict_name String
+  district_id      Int
+  districts        districts  @relation(fields: [district_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  villages         villages[]
+
+  @@unique([subdistrict_code, district_id])
+  @@index([district_id], map: "idx_subdistricts_district_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model subdistricts_raw {
+  subdistrict_code Int?
+  subdistrict_name String?
+  district_code    Int?
+
+  @@ignore
+}
+
+
+
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model villages {
+  id             Int          @id @default(autoincrement())
+  village_code   Int?
+  village_name   String
+  subdistrict_id Int
+  subdistricts   subdistricts @relation(fields: [subdistrict_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([village_code, subdistrict_id])
+  @@index([subdistrict_id], map: "idx_villages_subdistrict_id")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model villages_raw {
+  village_code     Int?
+  village_name     String?
+  subdistrict_code Int?
+
+  @@ignore
+}
+
+// Define the exact PRD Subscription Tiers
+enum PlanType {
+  FREE
+  PREMIUM
+  PRO
+  UNLIMITED
+}
+
+// ── THE B2B CLIENT MODEL ──
+model Client {
+  id                 String    @id @default(uuid())
+  company            String
+  email              String    @unique
+  phone              String?
+  gstNumber          String?
+  passwordHash       String?
+  
+  // 🚀 PRD Upgrades:
+  plan               PlanType  @default(FREE)
+  custom_daily_limit Int?      // Allows Admin to manually override plan limits!
+  
+  usage              Int       @default(0)
+  status             String    @default("PENDING_APPROVAL")
+  
+  apiKeys            ApiKey[]
+  api_logs           api_logs[]
+  
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  is2FAEnabled       Boolean   @default(false)
+  twoFactorSecret    String?  // Stores the secret key to generate the 6-digit code
+
+  @@map("clients")
+}
+
+
+// 🚀 NEW: PRD Section 10.2 API Key Model
+model ApiKey {
+  id         String    @id @default(uuid())
+  name       String    // e.g., "Production", "Staging"
+  key        String    @unique // The public ak_1234... key
+  secretHash String    // The bcrypt hashed as_1234... secret
+  
+  clientId   String
+  client     Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  status     String    @default("Active") // Active or Revoked
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  api_logs   api_logs[]
+
+  @@map("api_key")
+}
+
+model Admin {
+  id       String @id @default(uuid())
+  email    String @unique
+  password String // We will store the bcrypt hash here, NEVER the plain text!
+
+  @@map("admin")
+}
+
+
+// ⚙️ PRD Global Default Rate Limits
+model platform_settings {
+  id                    Int     @id @default(1)
+  maintenance_mode      Boolean @default(false)
+  free_limit            Int     @default(5000)     
+  premium_limit         Int     @default(50000)    
+  pro_limit             Int     @default(300000)   
+  unlimited_limit       Int     @default(1000000)  
+}
+
+
+// ── INCOMING SALES LEADS & DEMO REQUESTS ──
+model contact_requests {
+  id          String   @id @default(uuid())
+  full_name   String
+  email       String
+  phone       String?
+  state       String?
+  district    String?
+  subdistrict String?
+  village     String?
+  message     String   @db.Text
+  status      String   @default("NEW") // Options: "NEW", "CONTACTED", "CLOSED"
+  created_at  DateTime @default(now())
+
+  @@map("contact_requests")
+}

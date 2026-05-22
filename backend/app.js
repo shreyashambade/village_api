@@ -11,13 +11,23 @@ const locationRoutes = require("./routes/locationRoutes");
 const authRoutes = require("./routes/authRoutes");
 const {requireApiKey} = require("./middleware/auth");
 const {dailyLimiter, burstLimiter, authLimiter} = require("./middleware/rateLimiter");
+// 1. Import the new routes
+const clientRoutes = require("./routes/clientRoutes");
+
+const adminRoutes = require("./routes/adminRoutes");
 
 
 const app = express();
 
+const billingController = require('./controllers/billingController');
+
 
 app.use(helmet());
 app.use(cors());
+
+//   MOUNT WEBHOOK FIRST (Must use express.raw, NOT express.json)
+app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), billingController.stripeWebhook);
+
 app.use(express.json());
 
 
@@ -29,6 +39,20 @@ app.use("/api/v1", requireApiKey, requestLogger, dailyLimiter, burstLimiter, loc
 
 //swagger route
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// 2. Use the client routes
+app.use("/api/clients", clientRoutes);
+
+// admin route
+app.use("/api/admin", adminRoutes);
+
+// logroute
+app.use('/api/v1/logs', require('./routes/logRoutes'));
+
+// public route
+app.use("/api/public", require("./routes/publicRoutes"));
+
+
 
 
 // add render route
