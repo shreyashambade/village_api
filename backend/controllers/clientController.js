@@ -37,7 +37,7 @@ exports.registerClient = async (req, res) => {
         phone: phone || null,
         status: "PENDING_APPROVAL", // 🛑 Locked until Admin approves
         plan: "FREE", 
-        limit: 5000 
+        custom_daily_limit: 5000 
       }
     });
 
