@@ -12,13 +12,46 @@ export default function App() {
   const [fullAddress, setFullAddress] = useState("");
   const [submittedData, setSubmittedData] = useState(null);
   
-  // Controls which screen is showing: "demo", "admin", "portal", or "docs"
-  const [view, setView] = useState(localStorage.getItem("villageApiView") || "demo"); 
+ // Controls which screen is showing: "demo", "admin", "portal", or "docs"
+  const [view, setView] = useState(localStorage.getItem("villageApiView") || "demo");
 
+  // 1. Sync to local storage
   useEffect(() => {
     localStorage.setItem("villageApiView", view);
+  }, [view]);
 
-  },[view]);
+
+  // 2. Listen for the native browser BACK button
+  useEffect(() => {
+    const handlePopState = (event) => {
+      // When the user hits the back button, read the history state and update React!
+      if (event.state && event.state.view) {
+        setView(event.state.view);
+      } else {
+        setView("demo");
+      }
+    };
+
+    // Make sure the very first page load is registered in the history stack
+    if (!window.history.state) {
+      window.history.replaceState({ view: view }, '', view === 'demo' ? '/' : `/${view}`);
+    }
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [view]);
+
+  // 3. Custom Navigation Function (The Magic Fix)
+  const navigateTo = (newView) => {
+    // A. Figure out what the URL should look like
+    const path = newView === "demo" ? "/" : `/${newView}`;
+    
+    // B. Push the new URL to the browser history!
+    window.history.pushState({ view: newView }, "", path);
+    
+    // C. Actually change the screen in React
+    setView(newView);
+  };
 
   const [mousePos, setMousePos] = useState({ x: 500, y: 0 });
 
@@ -50,7 +83,7 @@ export default function App() {
         <style>{cssAnims}</style>
         
         {/* 🚀 Pass the setView function down as a prop! */}
-        <AdminDashboard onBackToDemo={() => setView("demo")} />
+        <AdminDashboard onBackToDemo={() => navigateTo("demo")} />
       </div>
     );
   }
@@ -65,9 +98,9 @@ export default function App() {
       
         {/* Render either the Portal or the Docs based on state */}
         {view === "portal" ? <ClientDashboard 
-        onOpenDocs={() => setView("docs")} 
-        onClosePortal={() => setView("demo")}
-        /> : <ApiDocs onCloseDocs={() => setView("portal")} />}
+        onOpenDocs={() => navigateTo("docs")} 
+        onClosePortal={() => navigateTo("demo")}
+        /> : <ApiDocs onCloseDocs={() => navigateTo("portal")} />}
         
       </div>
     );
@@ -97,7 +130,7 @@ export default function App() {
     <div onMouseMove={handleMouseMove} style={dynamicBgStyle}>
       <style>{cssAnims}</style>
 
-      <Hero onAdminClick={() => setView("admin")} onPortalClick={() => setView("portal")} />
+      <Hero onAdminClick={() => navigateTo("admin")} onPortalClick={() => navigateTo("portal")} />
       {/* 🚀 NEW: Dynamic Flexbox that stacks on mobile! */}
       <div style={{
         display: "flex",
