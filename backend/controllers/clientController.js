@@ -36,7 +36,7 @@ exports.registerClient = async (req, res) => {
         passwordHash, 
         phone: phone || null,
         status: "PENDING_APPROVAL", // 🛑 Locked until Admin approves
-        plan: "Free", 
+        plan: "FREE", 
         limit: 5000 
       }
     });
