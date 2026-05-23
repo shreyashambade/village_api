@@ -76,7 +76,7 @@ export default function AdminDashboard({ onBackToDemo }) {
       const fetchLeads = async () => {
         setIsLoadingLeads(true);
         try {
-          const res = await fetch("http://localhost:3000/api/admin/leads", {
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/leads`, {
             headers: { "Authorization": `Bearer ${adminToken}` }
           });
           const result = await res.json();
@@ -131,7 +131,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   useEffect(() => {
     const fetchLiveClients = async () => {
       try {
-        const response = await fetch("http://localhost:3000/api/clients/");
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/`);
         const result = await response.json();
         if (response.ok) setClients(result.data); 
       } catch (error) { console.error("Fetch error:", error); } 
@@ -144,7 +144,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   useEffect(() => {
     const fetchGeoTree = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/admin/states", { 
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/states`, { 
           headers: { "Authorization": `Bearer ${adminToken}` } 
         });
         const result = await res.json();
@@ -199,7 +199,7 @@ export default function AdminDashboard({ onBackToDemo }) {
       const fetchLogs = async () => {
         try {
           setIsLoadingLogs(true);
-          const res = await fetch("http://localhost:3000/api/admin/logs", {
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/logs`, {
             headers: { "Authorization": `Bearer ${adminToken}` }
           });
           const result = await res.json();
@@ -219,7 +219,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   useEffect(() => {
     const fetchLiveChart = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/admin/analytics/chart", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/analytics/chart`, {
           headers: { "Authorization": `Bearer ${adminToken}` }
         });
         const result = await res.json();
@@ -234,7 +234,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   useEffect(() => {
     const fetchOverviewStats = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/admin/analytics/overview", {
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/analytics/overview`, {
           headers: { "Authorization": `Bearer ${adminToken}` }
         });
         const result = await res.json();
@@ -250,7 +250,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/admin/settings", { headers: { "Authorization": `Bearer ${adminToken}` } });
+        const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/settings`, { headers: { "Authorization": `Bearer ${adminToken}` } });
         const result = await res.json();
         if (result.success) {
           setMaintenanceMode(result.data.maintenance_mode);
@@ -268,7 +268,7 @@ export default function AdminDashboard({ onBackToDemo }) {
     e.preventDefault();
     setLoginError("");
     try {
-      const res = await fetch("http://localhost:3000/api/admin/login", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: adminEmail, password: adminPassword })
@@ -302,7 +302,7 @@ export default function AdminDashboard({ onBackToDemo }) {
     if (!currentPassword) return alert("You must enter your current password to make changes.");
     
     try {
-      const res = await fetch("http://localhost:3000/api/admin/credentials", {
+      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/credentials`, {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",
@@ -337,7 +337,7 @@ export default function AdminDashboard({ onBackToDemo }) {
 
     setIsSearching(true);
     try {
-      let url = `http://localhost:3000/api/admin/villages/search?query=${encodeURIComponent(villageSearch)}`;
+      let url = `${import.meta.env.VITE_API_BASE_URL}/api/admin/villages/search?query=${encodeURIComponent(villageSearch)}`;
       if (subId) url += `&subdistrictId=${subId}`;
 
       const res = await fetch(url, { 
@@ -371,7 +371,7 @@ export default function AdminDashboard({ onBackToDemo }) {
 
     try {
       // 🚀 FIXED: Pointing to your dedicated secure Admin endpoint!
-      const response = await fetch("http://localhost:3000/api/admin/villages", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/villages`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -400,7 +400,7 @@ export default function AdminDashboard({ onBackToDemo }) {
     if (!window.confirm(`Are you absolutely sure you want to permanently delete the village "${villageName}"?`)) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/villages/${villageId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/villages/${villageId}`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${adminToken}`
@@ -427,7 +427,7 @@ export default function AdminDashboard({ onBackToDemo }) {
     if (newName.trim() === "") return alert("Village name cannot be empty!");
 
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/villages/${villageId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/villages/${villageId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -456,7 +456,7 @@ export default function AdminDashboard({ onBackToDemo }) {
 
   const handleSaveConfig = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/admin/settings", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/settings`, {
         method: "PUT",
         headers: { "Content-Type": "application/json", "Authorization": `Bearer ${adminToken}` },
         body: JSON.stringify({ 
@@ -486,7 +486,7 @@ export default function AdminDashboard({ onBackToDemo }) {
     if (!confirmPurge) return; // Admin chickened out (which is good!)
 
     try {
-      const response = await fetch("http://localhost:3000/api/admin/logs/purge", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/logs/purge`, {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${adminToken}`
@@ -512,7 +512,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   const handleResetKey = async (clientId) => {
     if (!window.confirm("Are you sure? The old API key will instantly stop working!")) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/${clientId}/reset`, { method: "PUT" });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/${clientId}/reset`, { method: "PUT" });
       const result = await response.json();
       if (response.ok) {
         setClients(clients.map(c => c.id === clientId ? { ...c, apiKey: result.data.apiKey } : c));
@@ -524,7 +524,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   const handleRevokeAccess = async (clientId) => {
     if (!window.confirm("Are you sure you want to suspend this client's API access?")) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/${clientId}/revoke`, { method: "PUT" });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/${clientId}/revoke`, { method: "PUT" });
       if (response.ok) {
         setClients(clients.map(c => c.id === clientId ? { ...c, status: "Suspended" } : c));
         setOpenDropdownId(null);
@@ -535,7 +535,7 @@ export default function AdminDashboard({ onBackToDemo }) {
   const handleReactivateAccess = async (clientId) => {
     if (!window.confirm("Restore this client's API access?")) return;
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/${clientId}/reactivate`, { method: "PUT" });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/${clientId}/reactivate`, { method: "PUT" });
       if (response.ok) {
         setClients(clients.map(c => c.id === clientId ? { ...c, status: "Active" } : c));
         setOpenDropdownId(null);
