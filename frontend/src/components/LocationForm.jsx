@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from "react";
 import Select, { components } from "react-select";
 
-const API_BASE = "https://village-location-api.onrender.com/api/v1";
-const HEADERS = { "X-API-Key": "ak_fe091cc73306163f81f23676a7062f6e" };
+const API_BASE = `${import.meta.env.VITE_API_BASE_URL}/api/v1`;
+const HEADERS = { "X-API-Key": import.meta.env.VITE_API_KEY };
 
 const DropdownIndicator = (props) => (
   <components.DropdownIndicator {...props}>
@@ -116,7 +116,7 @@ export default function LocationForm({ onAddressChange, onSuccess }) {
 
     try {
       // 🚀 THE REAL BACKEND CALL
-      const response = await fetch("http://localhost:3000/api/public/contact", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/public/contact`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
