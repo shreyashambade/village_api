@@ -100,7 +100,7 @@ export default function AdminDashboard({ onBackToDemo }) {
 
     // 2. Actually save the new status to the backend
     try {
-      const response = await fetch(`http://localhost:3000/api/admin/leads/${id}/status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/admin/leads/${id}/status`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

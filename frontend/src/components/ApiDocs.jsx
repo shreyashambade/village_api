@@ -55,7 +55,7 @@ export default function ApiDocs({ onCloseDocs }) {
       if (savedEmail) {
         try {
           // 🚀 Fetch from the updated dashboard endpoint that knows about the new ApiKey table
-          const res = await fetch(`http://localhost:3000/api/clients/me/dashboard?email=${encodeURIComponent(savedEmail)}`);
+          const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/me/dashboard?email=${encodeURIComponent(savedEmail)}`);
           const result = await res.json();
           
           if (result.success && result.data.keys.length > 0) {
@@ -88,7 +88,7 @@ export default function ApiDocs({ onCloseDocs }) {
     setResponse(null);
     setStatus(null);
 
-    let url = `http://localhost:3000${activeEndpoint.path}`;
+    let url = `${import.meta.env.VITE_API_BASE_URL}${activeEndpoint.path}`;
     let queryParts = [];
 
     for (const p of activeEndpoint.params) {

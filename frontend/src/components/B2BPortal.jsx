@@ -26,7 +26,7 @@ export default function B2BPortal() {
   const fetchClientData = async (emailToFetch) => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/usage/${emailToFetch}`);
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/usage/${emailToFetch}`);
       const result = await response.json();
       if (response.ok) {
         setApiKey(result.data.apiKey);
@@ -52,7 +52,7 @@ export default function B2BPortal() {
     setError(null);
 
     try {
-      const response = await fetch("http://localhost:3000/api/clients/register", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ company, email })

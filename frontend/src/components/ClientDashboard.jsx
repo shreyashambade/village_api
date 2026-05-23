@@ -68,7 +68,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
     const fetchDashboard = async () => {
       setIsLoading(true);
       try {
-        const response = await fetch(`http://localhost:3000/api/clients/me/dashboard?email=${encodeURIComponent(userEmail)}`);
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/me/dashboard?email=${encodeURIComponent(userEmail)}`);
         const result = await response.json();
         if (result.success) {
           setDashboardData(result.data);
@@ -96,7 +96,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
         // 🔐 LOGIN FLOW
         if (!regEmail || !regPassword) { setAuthError("Email and Password are required to log in."); setAuthLoading(false); return; }
         
-        const response = await fetch(`http://localhost:3000/api/clients/login`, {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/login`, {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ email: regEmail, password: regPassword })
         });
@@ -116,7 +116,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
         // 📝 REGISTER FLOW
         if (!regCompany || !regEmail || !regPassword) { setAuthError("Company, Email, and Password are required."); setAuthLoading(false); return; }
         
-        const response = await fetch("http://localhost:3000/api/clients/register", {
+        const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/register`, {
           method: "POST", headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ company: regCompany, email: regEmail, password: regPassword, phone: regPhone })
         });
@@ -154,7 +154,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
     if (!window.confirm("Are you sure? Your old API key will instantly stop working!")) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/${clientId}/reset`, { method: "PUT" });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/${clientId}/reset`, { method: "PUT" });
       const result = await response.json();
       
       if (response.ok) {
@@ -180,7 +180,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
     if (!window.confirm("Are you sure? This key will instantly stop working and cannot be recovered.")) return;
 
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/keys/${keyId}/revoke`, { method: "PUT" });
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/keys/${keyId}/revoke`, { method: "PUT" });
       if (response.ok) {
         // Update the UI locally so it instantly turns red without refreshing the page!
         setDashboardData(prev => ({
@@ -198,7 +198,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
   const handleSaveProfile = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch(`http://localhost:3000/api/clients/${dashboardData.profile.id}/profile`, {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/${dashboardData.profile.id}/profile`, {
         method: "PUT", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ company: editCompany, email: editEmail })
       });
@@ -216,7 +216,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
       // Assuming you store the client's JWT in localStorage just like the admin token
       const clientToken = localStorage.getItem("villageClientToken"); 
       
-      const response = await fetch("http://localhost:3000/api/clients/billing/checkout", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/billing/checkout`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -240,7 +240,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
 
   const handleManageBilling = async () => {
     try {
-      const response = await fetch("http://localhost:3000/api/clients/billing/portal", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/billing/portal`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: userEmail })
       });
@@ -372,7 +372,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
     }
 
     try {
-      const response = await fetch("http://localhost:3000/api/clients/auth/2fa/generate", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/auth/2fa/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: currentUserEmail }) // <-- Sent successfully!
@@ -395,7 +395,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
     const currentUserEmail = localStorage.getItem("villageApiUserEmail");
 
     try {
-      const response = await fetch("http://localhost:3000/api/clients/auth/2fa/verify", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/auth/2fa/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: currentUserEmail, token: tokenInput }) // <-- Send the 6 digits!
@@ -425,7 +425,7 @@ export default function ClientDashboard({ onOpenDocs , onClosePortal }) {
     const currentUserEmail = localStorage.getItem("villageApiUserEmail");
 
     try {
-      const response = await fetch("http://localhost:3000/api/clients/auth/2fa/disable", {
+      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/api/clients/auth/2fa/disable`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: currentUserEmail }) 

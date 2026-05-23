@@ -18,7 +18,7 @@ openapi: "3.0.0",
         {
              url: process.env.NODE_ENV === "production"
             ? "https://village-location-api.onrender.com"
-            : "http://localhost:3000",
+            : `${import.meta.env.VITE_API_BASE_URL}`,
         },
     ],
 
