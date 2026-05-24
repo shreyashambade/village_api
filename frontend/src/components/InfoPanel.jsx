@@ -1,5 +1,5 @@
 export default function InfoPanel({ fullAddress }) {
-  const leftPanel = { padding: "32px 32px 32px 0", borderRight: "1px solid rgba(255,255,255,0.05)" };
+  const leftPanel = { width: "100%", boxSizing: "border-box", padding: "16px 0" };
   const statsGrid = { display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 28 };
   // Notice we made the borders lighter and backgrounds more transparent for the glass effect
   const statCard = { background: "rgba(15,23,42,0.4)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 12, padding: "14px 16px" };
