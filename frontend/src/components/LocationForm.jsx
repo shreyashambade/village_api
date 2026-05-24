@@ -147,7 +147,7 @@ export default function LocationForm({ onAddressChange, onSuccess }) {
     }
   };
 
-  const formPanel = { padding: "32px 0 32px 32px" };
+  const formPanel = { width: "100%", boxSizing: "border-box", padding: "16px 0" };
   const stepBar = { display: "flex", alignItems: "center", gap: 4, marginBottom: 24, flexWrap: "wrap" };
   const fi = { width: "100%", padding: "13px 16px", borderRadius: 12, fontSize: 14, background: "rgba(15,23,42,0.6)", color: "white", border: "1.5px solid rgba(255,255,255,0.1)", outline: "none", boxSizing: "border-box" };
   const fErr = { border: "1.5px solid #ef4444" };
