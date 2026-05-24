@@ -21,7 +21,7 @@ export default function Hero({ onAdminClick, onPortalClick }) {
   };
 
   const heroSection = {
-    textAlign: "center", padding: "60px 24px 40px", maxWidth: 680, margin: "0 auto",
+    textAlign: "center", padding: "clamp(24px, 6vw, 60px) 24px 40px", maxWidth: 680, margin: "0 auto",
   };
 
   return (
