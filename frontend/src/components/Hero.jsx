@@ -1,10 +1,12 @@
 export default function Hero({ onAdminClick, onPortalClick }) {
   // Styles specifically for the Hero component
-  const navStyle = {
+ const navStyle = {
     display: "flex", alignItems: "center", justifyContent: "space-between",
-    padding: "14px 32px", borderBottom: "1px solid rgba(255,255,255,0.05)",
-    background: "rgba(15, 23, 42, 0.99)", backdropFilter: "blur(16px)",
-    position: "sticky", top: 0, zIndex: 50,
+    padding: "14px 16px", 
+    flexWrap: "wrap", 
+    gap: "10px",
+    borderBottom: "1px solid rgba(255,255,255,0.05)",
+    /* ... */
   };
 
   const navLogo = {

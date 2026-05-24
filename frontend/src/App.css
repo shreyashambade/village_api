@@ -1,3 +1,9 @@
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+  background-color: #030712; /* Fallback to your dark color just in case */
+}
+
 .counter {
   font-size: 16px;
   padding: 5px 10px;

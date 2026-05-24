@@ -799,7 +799,9 @@ export default function AdminDashboard({ onBackToDemo }) {
                <div><h1 style={{ color: "white", fontSize: 28, fontWeight: 800, margin: "0 0 8px" }}>B2B Users</h1><p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>Manage clients, API keys, and track usage limits.</p></div>
              </div>
              <div className="glow-card" style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 16, paddingBottom: "100px" }}>
-               <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
+
+              <div style={{ overflowX: "auto", width: "100%" }}>
+               <table style={{ width: "100%", minWidth: "800px", borderCollapse: "collapse", textAlign: "left" }}>
                  <thead>
                    <tr style={{ background: "rgba(255,255,255,0.02)", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                      <th style={{ padding: "16px 24px", color: "#94a3b8", fontSize: 12, fontWeight: 600 }}>COMPANY</th>
@@ -841,6 +843,7 @@ export default function AdminDashboard({ onBackToDemo }) {
                    ))}
                  </tbody>
                </table>
+               </div>
              </div>
           </div>
         )}
@@ -1162,7 +1165,7 @@ export default function AdminDashboard({ onBackToDemo }) {
               <p style={{ color: "#64748b", fontSize: 14, margin: 0 }}>Configure global limits, manage admin access, and control platform health.</p>
             </div>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "24px" }}>
               
               {/* PLATFORM CONFIGURATION */}
               <div className="glow-card" style={{ background: "rgba(15,23,42,0.6)", border: "1px solid rgba(255,255,255,0.05)", borderRadius: 16, padding: "24px" }}>
@@ -1193,7 +1196,7 @@ export default function AdminDashboard({ onBackToDemo }) {
                       <span style={{ color: "#0ea5e9" }}>✦</span> API Rate Limits (Per Day)
                     </h3>
                     
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16 }}>
                       {/* Free Tier */}
                       <div>
                         <label style={{ display: "block", color: "#94a3b8", fontSize: 12, marginBottom: 4 }}>Free Tier</label>
