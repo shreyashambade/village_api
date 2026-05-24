@@ -64,7 +64,7 @@ export default function Hero({ onAdminClick, onPortalClick }) {
 
       {/* Hero */}
       <div style={heroSection}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 999, background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", marginBottom: 20 ,maxWidth:800, margin: "0 auto"}}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 14px", borderRadius: 999, background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)", maxWidth: 800, margin: "0 auto 24px auto" }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#22c55e", display: "inline-block", boxShadow: "0 0 6px #22c55e" }} />
           <span style={{ fontSize: 12, color: "#60a5fa", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>POWERING ADDRESS SEARCH ACROSS INDIA</span>
         </div>
