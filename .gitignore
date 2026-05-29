@@ -8,3 +8,5 @@ claudefiles/
 prd/
 prd/apikeys.txt
 data_cleaning/raw_work/
+
+apikeys.txt
