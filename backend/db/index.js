@@ -1,4 +1,5 @@
 const { Pool } = require("pg");
+require("dotenv").config();
 
 const isProduction = process.env.NODE_ENV === "production";
 
@@ -14,7 +15,7 @@ const pool = new Pool(
               user: "postgres",
               host: "localhost",
               database: "villageDB",
-              password: "Sradb@1",
+              password: process.env.DB_PASSWORD,
               port: 5432,
           }
 );
