@@ -548,6 +548,9 @@ export default function AdminDashboard({ onBackToDemo }) {
   // 🚀 COMPILER-SAFE SEARCH FILTER LOGIC (Bypasses any optional chaining bugs)
   // ────────────────────────────────────────────────────────────────────────
   const filteredLogs = apiLogs.filter(log => {
+    //FIX 1: Instantly hide any "Internal System" (Admin) logs from the UI table!
+    if (!log.Client) return false;
+
     // 1. Filter by Status Code
     const matchStatus = logStatusFilter === "" || 
       (logStatusFilter === "200" && log.status_code >= 200 && log.status_code < 300) ||
@@ -561,17 +564,12 @@ export default function AdminDashboard({ onBackToDemo }) {
     const searchStr = logSearchQuery.toLowerCase().trim();
     if (searchStr === "") return matchStatus && matchEndpoint;
 
-    const companyName = log.Client?.company?.toLowerCase() || "";
-    
-    // 🚀 FIXED: Reads safely from the direct api_keys lookup block
+    const companyName = log.Client.company.toLowerCase();
     const primaryApiKey = log.api_keys?.api_key?.toLowerCase() || "";
-    
-    const fallbackLabel = log.Client ? "" : "internal system super admin session token";
 
     const matchSearch = 
       companyName.includes(searchStr) || 
-      primaryApiKey.includes(searchStr) ||
-      fallbackLabel.includes(searchStr);
+      primaryApiKey.includes(searchStr);
 
     return matchStatus && matchEndpoint && matchSearch;
   });

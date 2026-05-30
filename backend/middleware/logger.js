@@ -2,6 +2,11 @@ const pool = require("../db");
 const crypto = require("crypto");
 
 exports.requestLogger = (req, res, next) => {
+
+    if (req.originalUrl.startsWith('/api/admin')) {
+      return next(); 
+  }
+
     req.requestId =  "req_" + crypto.randomBytes(6).toString("hex");
     req.startTime = Date.now();
 
