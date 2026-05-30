@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, Database, Activity, Clock, LayoutDashboard, Key, Settings, Search, MoreVertical, Edit2, Trash2, MapPin, Filter, Download, AlertTriangle, Shield, HardDrive, LogOut} from 'lucide-react';
+import { Users, Data2ase, Activity, Clock, LayoutDashboard, Key, Settings, Search, MoreVertical, Edit2, Trash2, MapPin, Filter, Download, AlertTriangle, Shield, HardDrive, LogOut} from 'lucide-react';
 
 import { useIsMobile } from './useWindowSize';
 
@@ -817,10 +817,12 @@ export default function AdminDashboard({ onBackToDemo }) {
                        <td style={{ padding: "16px 24px" }}><p style={{ margin: 0, color: "white", fontSize: 13, fontWeight: 500 }}>{user.usage?.toLocaleString() || 0} / {user.custom_daily_limit ? user.custom_daily_limit.toLocaleString() : "Plan Default"}</p></td>
                        <td style={{ padding: "16px 24px" }}>
                          {user.status === "Active" ? (
-                           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: "rgba(16,185,129,0.1)", color: "#10b981" }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />Active</span>
-                         ) : (
-                           <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: "rgba(245,158,11,0.1)", color: "#f59e0b" }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b" }} />Suspended</span>
-                         )}
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: "rgba(16,185,129,0.1)", color: "#10b981" }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981" }} />Active</span>
+                        ) : user.status === "PENDING_APPROVAL" ? (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: "rgba(14,165,233,0.1)", color: "#0ea5e9" }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#0ea5e9" }} />Pending</span>
+                        ) : (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 999, fontSize: 11, fontWeight: 700, background: "rgba(245,158,11,0.1)", color: "#f59e0b" }}><div style={{ width: 6, height: 6, borderRadius: "50%", background: "#f59e0b" }} />Suspended</span>
+                        )}
                        </td>
                        <td style={{ padding: "16px 24px", textAlign: "right", position: "relative" }}>
                          <button onClick={(e) => { e.stopPropagation(); setOpenDropdownId(openDropdownId === user.id ? null : user.id); }} style={{ background: "transparent", border: "none", color: "#64748b", cursor: "pointer" }}><MoreVertical size={18} /></button>
@@ -829,11 +831,13 @@ export default function AdminDashboard({ onBackToDemo }) {
                              <button onClick={() => handleViewDetails(user)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "white", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>View Details</button>
                              <button onClick={() => handleResetKey(user.id)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "white", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>Reset Key</button>
                              <div style={{ height: 1, background: "rgba(255,255,255,0.1)", margin: "4px 0" }}></div>
-                             {user.status === "Active" ? (
-                               <button onClick={() => handleRevokeAccess(user.id)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "#ef4444", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>Suspend</button>
-                             ) : (
-                               <button onClick={() => handleReactivateAccess(user.id)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "#10b981", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>Reactivate</button>
-                             )}
+                              {user.status === "Active" ? (
+                                <button onClick={() => handleRevokeAccess(user.id)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "#ef4444", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>Suspend</button>
+                              ) : user.status === "PENDING_APPROVAL" ? (
+                                <button onClick={() => handleReactivateAccess(user.id)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "#10b981", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>Approve Client</button>
+                              ) : (
+                                <button onClick={() => handleReactivateAccess(user.id)} style={{ width: "100%", padding: "8px 12px", background: "transparent", border: "none", color: "#10b981", fontSize: 13, textAlign: "left", cursor: "pointer", borderRadius: 4 }}>Reactivate</button>
+                              )}
                            </div>
                          )}
                        </td>
