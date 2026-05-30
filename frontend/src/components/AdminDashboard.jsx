@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Users, Data2ase, Activity, Clock, LayoutDashboard, Key, Settings, Search, MoreVertical, Edit2, Trash2, MapPin, Filter, Download, AlertTriangle, Shield, HardDrive, LogOut} from 'lucide-react';
+import { Users, Database, Activity, Clock, LayoutDashboard, Key, Settings, Search, MoreVertical, Edit2, Trash2, MapPin, Filter, Download, AlertTriangle, Shield, HardDrive, LogOut} from 'lucide-react';
 
 import { useIsMobile } from './useWindowSize';
 
